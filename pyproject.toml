@@ -9,7 +9,7 @@ author = "PhD Ariel S. Loyarte"
 authors = [
   { name="PhD Ariel S. Loyarte", email="aloyarte@frsf.utn.edu.ar" },
 ]
-description = "Optimal power flow calculation with quadratic costs for the Electrical Grid Simulator"
+description = "Optimal Power Flow calculation with quadratic costs for the Electrical Grid Simulator (EGS)"
 readme = "README_PyPI.md"
 requires-python = ">=3.8"
 dependencies = [
