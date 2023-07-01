@@ -23,6 +23,10 @@ classifiers = [
 keywords = ["electrical networks", "simulation", "energy", "power systems", "optimal power flow", "Electrical Grid Simulator", "pandapower"]
 license = {text = "MIT"}
 
+[project.urls]
+"Homepage" = "https://github.com/aloytag/electricalsim-opf-quadratic"
+"Bug Tracker" = "https://github.com/aloytag/electricalsim-opf-quadratic/issues"
+"Repository" = "https://github.com/aloytag/electricalsim-opf-quadratic"
 
 [project.entry-points.'electricalsim.extensions']
 opf_quadratic = 'electricalsim_opf_quadratic'
