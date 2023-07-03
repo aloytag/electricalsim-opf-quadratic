@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "electricalsim_opf_quadratic"
-version = "1.0"
-author = "PhD Ariel S. Loyarte"
+version = "1.1"
+author = "Dr. Ing. Ariel S. Loyarte"
 authors = [
-  { name="PhD Ariel S. Loyarte", email="aloyarte@frsf.utn.edu.ar" },
+  { name="Dr. Ing. Ariel S. Loyarte", email="aloyarte@frsf.utn.edu.ar" },
 ]
 description = "Optimal Power Flow calculation with quadratic costs for the Electrical Grid Simulator (EGS)"
 readme = "README_PyPI.md"
