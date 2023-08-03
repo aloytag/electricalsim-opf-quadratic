@@ -46,37 +46,44 @@ class Extension(ExtensionBase):
                                      'cq1_eur_per_mvar', 'cq0_eur',
                                      'cp2_eur_per_mw2', 'cq2_eur_per_mvar2'])  # Empty DataFrame
 
-        for _, row in self.net.poly_cost.iterrows():
-            new_data_row = pd.Series(index=['name', 'element_type', 'element_id',
-                                            'bus', 'cp1_eur_per_mw', 'cp0_eur',
-                                            'cq1_eur_per_mvar', 'cq0_eur',
-                                            'cp2_eur_per_mw2', 'cq2_eur_per_mvar2'])
+        try:
+            for _, row in self.net.poly_cost.iterrows():
+                new_data_row = pd.Series(index=['name', 'element_type', 'element_id',
+                                                'bus', 'cp1_eur_per_mw', 'cp0_eur',
+                                                'cq1_eur_per_mvar', 'cq0_eur',
+                                                'cp2_eur_per_mw2', 'cq2_eur_per_mvar2'])
 
-            type_ = row['et']
-            element_id = row['element']
-            new_data_row['element_id'] = element_id
-            new_data_row['element_type'] = type_
-            new_data_row['cp0_eur'] = row['cp0_eur']
-            new_data_row['cp1_eur_per_mw'] = row['cp1_eur_per_mw']
-            new_data_row['cp2_eur_per_mw2'] = row['cp2_eur_per_mw2']
-            new_data_row['cq0_eur'] = row['cq0_eur']
-            new_data_row['cq1_eur_per_mvar'] = row['cq1_eur_per_mvar']
-            new_data_row['cq2_eur_per_mvar2'] = row['cq2_eur_per_mvar2']
-            new_data_row['name'] = self.net[type_].at[element_id, 'name']
-            if type_=='dcline':
-                bus_id_from = self.net.dcline.at[element_id, 'bus_from']
-                bus_id_to = self.net.dcline.at[element_id, 'bus_to']
+                type_ = row['et']
+                element_id = row['element']
+                new_data_row['element_id'] = element_id
+                new_data_row['element_type'] = type_
+                new_data_row['cp0_eur'] = row['cp0_eur']
+                new_data_row['cp1_eur_per_mw'] = row['cp1_eur_per_mw']
+                new_data_row['cp2_eur_per_mw2'] = row['cp2_eur_per_mw2']
+                new_data_row['cq0_eur'] = row['cq0_eur']
+                new_data_row['cq1_eur_per_mvar'] = row['cq1_eur_per_mvar']
+                new_data_row['cq2_eur_per_mvar2'] = row['cq2_eur_per_mvar2']
+                new_data_row['name'] = self.net[type_].at[element_id, 'name']
+                if type_=='dcline':
+                    bus_id_from = self.net.dcline.at[element_id, 'bus_from']
+                    bus_id_to = self.net.dcline.at[element_id, 'bus_to']
 
-                bus_name_from = self.net.bus.at[bus_id_from, 'name']
-                bus_name_to = self.net.bus.at[bus_id_to, 'name']
+                    bus_name_from = self.net.bus.at[bus_id_from, 'name']
+                    bus_name_to = self.net.bus.at[bus_id_to, 'name']
 
-                new_data_row['bus'] = f"{bus_id_from} - {bus_id_to} ({bus_name_from} - {bus_name_to})"
-            else:
-                bus_id = self.net[type_].at[element_id, 'bus']
-                bus_name = self.net.bus.at[bus_id, 'name']
-                new_data_row['bus'] = f"{bus_id} ({bus_name})"
+                    new_data_row['bus'] = f"{bus_id_from} - {bus_id_to} ({bus_name_from} - {bus_name_to})"
+                else:
+                    bus_id = self.net[type_].at[element_id, 'bus']
+                    bus_name = self.net.bus.at[bus_id, 'name']
+                    new_data_row['bus'] = f"{bus_id} ({bus_name})"
 
-            data = pd.concat((data, new_data_row.to_frame().T), axis=0, ignore_index=True)
+                data = pd.concat((data, new_data_row.to_frame().T), axis=0, ignore_index=True)
+
+        except KeyError:
+            data = pd.DataFrame(columns=['name', 'element_type', 'element_id',
+                                         'bus', 'cp1_eur_per_mw', 'cp0_eur',
+                                         'cq1_eur_per_mvar', 'cq0_eur',
+                                         'cp2_eur_per_mw2', 'cq2_eur_per_mvar2'])  # Empty DataFrame
 
         return data
 
@@ -112,30 +119,37 @@ class Extension(ExtensionBase):
         # tmp = sys.stdout  # Capture old stdout with a temporary variable
         my_result = StringIO()
         # sys.stdout = my_result  # New stdout liked to the new StrigIO object
-        if self.input_dialog.radio_acopf.isChecked():
-            pp.runopp(self.copy_net, verbose=False,
-                      calculate_voltage_angles=calculate_voltage_angles,
-                      check_connectivity=True, suppress_warnings=True,
-                      switch_rx_ratio=switch_rx_ratio, delta=delta, init=init,
-                      numba=True, trafo3w_losses=trafo3w_losses,
-                      consider_line_temperature=consider_line_temperature,
-                      OPF_VIOLATION=self.input_dialog.OPF_VIOLATION.value()*1e-6,
-                      PDIPM_COSTTOL=self.input_dialog.PDIPM_COSTTOL.value()*1e-6,
-                      PDIPM_GRADTOL=self.input_dialog.PDIPM_GRADTOL.value()*1e-6,
-                      PDIPM_COMPTOL=self.input_dialog.PDIPM_COMPTOL.value()*1e-6,
-                      PDIPM_FEASTOL=self.input_dialog.PDIPM_FEASTOL.value()*1e-6,
-                      PDIPM_MAX_IT=self.input_dialog.PDIPM_MAX_IT.value(),
-                      SCPDIPM_RED_IT=self.input_dialog.SCPDIPM_RED_IT.value())
-        else:
-            pp.rundcopp(self.copy_net, verbose=False, check_connectivity=True,
-                        suppress_warnings=True, switch_rx_ratio=switch_rx_ratio,
-                        delta=delta, trafo3w_losses=trafo3w_losses)
+
+        try:
+            if self.input_dialog.radio_acopf.isChecked():
+                pp.runopp(self.copy_net, verbose=False,
+                          calculate_voltage_angles=calculate_voltage_angles,
+                          check_connectivity=True, suppress_warnings=True,
+                          switch_rx_ratio=switch_rx_ratio, delta=delta, init=init,
+                          numba=True, trafo3w_losses=trafo3w_losses,
+                          consider_line_temperature=consider_line_temperature,
+                          OPF_VIOLATION=self.input_dialog.OPF_VIOLATION.value()*1e-6,
+                          PDIPM_COSTTOL=self.input_dialog.PDIPM_COSTTOL.value()*1e-6,
+                          PDIPM_GRADTOL=self.input_dialog.PDIPM_GRADTOL.value()*1e-6,
+                          PDIPM_COMPTOL=self.input_dialog.PDIPM_COMPTOL.value()*1e-6,
+                          PDIPM_FEASTOL=self.input_dialog.PDIPM_FEASTOL.value()*1e-6,
+                          PDIPM_MAX_IT=self.input_dialog.PDIPM_MAX_IT.value(),
+                          SCPDIPM_RED_IT=self.input_dialog.SCPDIPM_RED_IT.value())
+            else:
+                pp.rundcopp(self.copy_net, verbose=False, check_connectivity=True,
+                            suppress_warnings=True, switch_rx_ratio=switch_rx_ratio,
+                            delta=delta, trafo3w_losses=trafo3w_losses)
+
+        except pp.optimal_powerflow.OPFNotConverged:
+            self.print('Solver did not converge!')
+            return
         # sys.stdout = tmp  # Back to normal
 
         if not self.copy_net['OPF_converged']:
-            title = 'Not converged!'
-            text_content = 'Solver did not converge.'
-            QtWidgets.QMessageBox.critical(self.input_dialog, title, text_content)
+            # title = 'Not converged!'
+            # text_content = 'Solver did not converge.'
+            # QtWidgets.QMessageBox.critical(self.input_dialog, title, text_content)
+            self.print('Solver did not converge!')
             return
 
         ac = self.copy_net["_options"]["ac"]
