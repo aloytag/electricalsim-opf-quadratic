@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 from copy import deepcopy
 from io import StringIO
 
-from Qt import QtCompat, QtWidgets
+from PySide6.QtUiTools import QUiLoader
+from PySide6 import QtCore, QtWidgets
 from electricalsim.extensions.extension_classes import ExtensionBase
 import pandas as pd
 import pandapower as pp
@@ -15,6 +15,8 @@ from pandapower.pypower.ppoption import ppoption
 
 directory = os.path.dirname(__file__)
 input_ui_path = os.path.join(directory, 'input.ui')
+ui_file_ = QtCore.QFile(input_ui_path)
+ui_file_.open(QtCore.QIODeviceBase.OpenModeFlag.ReadOnly)
 
 
 class Extension(ExtensionBase):
@@ -24,7 +26,8 @@ class Extension(ExtensionBase):
         self.set_separate_thread(True)
         self.set_extension_window(True)
 
-        self.input_dialog = QtCompat.loadUi(uifile=input_ui_path)
+        loader = QUiLoader()
+        self.input_dialog = loader.load(ui_file_)
         self.input_dialog.setWindowIcon(self.egs_icon())
 
         self.compute_opf = False

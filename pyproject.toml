@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "electricalsim_opf_quadratic"
-version = "1.2"
+version = "1.3"
 author = "Dr. Ing. Ariel S. Loyarte"
 authors = [
   { name="Dr. Ing. Ariel S. Loyarte", email="aloyarte@frsf.utn.edu.ar" },
@@ -13,7 +13,7 @@ description = "Optimal Power Flow calculation with quadratic costs for the Elect
 readme = "README_PyPI.md"
 requires-python = ">=3.8"
 dependencies = [
-  "electricalsim>=0.0.7.0",
+  "electricalsim>=0.0.8.0",
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
