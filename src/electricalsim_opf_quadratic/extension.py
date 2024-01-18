@@ -15,8 +15,6 @@ from pandapower.pypower.ppoption import ppoption
 
 directory = os.path.dirname(__file__)
 input_ui_path = os.path.join(directory, 'input.ui')
-ui_file_ = QtCore.QFile(input_ui_path)
-ui_file_.open(QtCore.QIODeviceBase.OpenModeFlag.ReadOnly)
 
 
 class Extension(ExtensionBase):
@@ -27,6 +25,8 @@ class Extension(ExtensionBase):
         self.set_extension_window(True)
 
         loader = QUiLoader()
+        ui_file_ = QtCore.QFile(input_ui_path)
+        ui_file_.open(QtCore.QIODeviceBase.OpenModeFlag.ReadOnly)
         self.input_dialog = loader.load(ui_file_)
         self.input_dialog.setWindowIcon(self.egs_icon())
 
@@ -162,11 +162,15 @@ class Extension(ExtensionBase):
             ppopt = ppoption(VERBOSE=True, PF_DC=not ac, INIT=init)
             ppopt['OUT_ALL'] = 1
 
-            printpf(baseMVA=result["baseMVA"], bus=result["bus"], gen=result["gen"],
-                    branch=result["branch"], f=result["f"], success=result["success"],
-                    et=result["et"], fd=my_result, ppopt=ppopt)
+            try:
+                printpf(baseMVA=result["baseMVA"], bus=result["bus"], gen=result["gen"],
+                        branch=result["branch"], f=result["f"], success=result["success"],
+                        et=result["et"], fd=my_result, ppopt=ppopt)
 
-            self.print(my_result.getvalue())
+                self.print(my_result.getvalue())
+            except IndexError:
+                self.print('Solver did not converge!')
+                return
         else:
             self.print(f'OPTIMIZED COST: {self.compute_cost()}')
 
